@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Aplicación Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="header">
+        <h1>Aplicación Demo – Frontend Estático</h1>
+    </header>
+
+    <main class="container">
+
+        <section class="card">
+            <h2>Estado del Backend</h2>
+            <button id="checkHealth" class="btn">Verificar</button>
+            <p id="healthStatus" class="status-text">—</p>
+        </section>
+
+        <section class="card">
+            <h2>Items</h2>
+
+            <form id="itemForm" class="form">
+                <input type="text" id="name" placeholder="Nombre" required>
+                <input type="number" step="0.01" id="price" placeholder="Precio" required>
+                <button type="submit" class="btn">Crear</button>
+            </form>
+
+            <ul id="itemList" class="item-list"></ul>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>Prueba DevOps – AWS + Terraform + Lambda + DynamoDB</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

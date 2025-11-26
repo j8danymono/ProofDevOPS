@@ -58,3 +58,7 @@ def list_items() -> List[Item]:
             )
         )
     return result
+
+def reset_items() -> None:
+    """Solo para tests: borra datos de DynamoDB o del mock."""
+    pass

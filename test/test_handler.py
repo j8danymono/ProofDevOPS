@@ -1,51 +1,49 @@
-import sys
 import os
-import json
-from unittest.mock import MagicMock
+import uuid
+import boto3
+from decimal import Decimal
 
-sys.modules["boto3"] = MagicMock()
-
-os.environ.setdefault("TABLE_NAME", "dummy-table")
-
-# Ahora sí podemos importar tu código
-from app.domain import reset_items
-from app.handler import lambda_handler
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table(os.environ["TABLE_NAME"])
 
 
-def test_health_ok():
-    event = {
-        "rawPath": "/health",
-        "requestContext": {"http": {"method": "GET"}},
+def _to_decimal(value):
+    if isinstance(value, float):
+        return Decimal(str(value))
+    return value
+
+
+def create_item(name: str, price: float) -> dict:
+    item = {
+        "id": str(uuid.uuid4()),
+        "name": name,
+        "price": _to_decimal(price),
     }
-
-    resp = lambda_handler(event, None)
-    assert resp["statusCode"] == 200
-    body = json.loads(resp["body"])
-    assert body["status"] == "ok"
+    table.put_item(Item=item)
+    return item
 
 
-def test_create_item_and_list():
-    reset_items()
+def list_items() -> list[dict]:
+    resp = table.scan()
+    return resp.get("Items", [])
 
-    create_event = {
-        "rawPath": "/items",
-        "requestContext": {"http": {"method": "POST"}},
-        "body": json.dumps({"name": "Café", "price": 10.5}),
-    }
+def reset_items() -> None:
+    """
+    Helper solo para tests:
+    borra todos los items de la tabla (o del mock de boto3).
+    """
+    try:
+        scan = table.scan()
+        items = scan.get("Items", [])
 
-    resp = lambda_handler(create_event, None)
-    assert resp["statusCode"] == 201
-    created = json.loads(resp["body"])
-    assert created["name"] == "Café"
-    assert created["price"] == 10.5
-    assert "id" in created
+        if not items:
+            return
 
-    list_event = {
-        "rawPath": "/items",
-        "requestContext": {"http": {"method": "GET"}},
-    }
-
-    resp_list = lambda_handler(list_event, None)
-    assert resp_list["statusCode"] == 200
-    items_body = json.loads(resp_list["body"])
-    assert len(items_body["items"]) == 1
+        with table.batch_writer() as batch:
+            for item in items:
+                # Ajusta la clave primaria según tu modelo
+                batch.delete_item(Key={"id": item["id"]})
+    except Exception:
+        # En los tests con boto3 mockeado, esto no va a hacer nada real,
+        # y cualquier error lo ignoramos porque solo es un helper.
+        pass

@@ -7,6 +7,8 @@ sys.modules["boto3"] = MagicMock()
 
 import os
 import json
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, ROOT_DIR)
 
 # Variable de entorno requerida para domain.py
 os.environ.setdefault("TABLE_NAME", "dummy-table")

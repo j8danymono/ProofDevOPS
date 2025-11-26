@@ -1,6 +1,11 @@
 import json
 from typing import Any, Dict
-from domain import create_item, list_items
+try:
+    # ejecución normal (lambda o entorno local)
+    from domain import create_item, list_items
+except ImportError:
+    # ejecución dentro del paquete app/ (como en pytest)
+    from app.domain import create_item, list_items
 
 def _response(status_code: int, body: Dict[str, Any]) -> Dict[str, Any]:
     return {

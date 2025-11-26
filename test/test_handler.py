@@ -1,49 +1,55 @@
+# ============================================================
+# MOCK DE BOTO3 PARA EVITAR REGION Y CONEXIONES REALES
+# ============================================================
+import sys
+from unittest.mock import MagicMock
+sys.modules["boto3"] = MagicMock()
+
 import os
-import uuid
-import boto3
-from decimal import Decimal
+import json
 
-dynamodb = boto3.resource("dynamodb")
-table = dynamodb.Table(os.environ["TABLE_NAME"])
+# Variable de entorno requerida para domain.py
+os.environ.setdefault("TABLE_NAME", "dummy-table")
 
-
-def _to_decimal(value):
-    if isinstance(value, float):
-        return Decimal(str(value))
-    return value
+# Ahora sí se pueden importar tus módulos sin que boto3 explote
+from app.domain import reset_items
+from app.handler import lambda_handler
 
 
-def create_item(name: str, price: float) -> dict:
-    item = {
-        "id": str(uuid.uuid4()),
-        "name": name,
-        "price": _to_decimal(price),
+def test_health_ok():
+    event = {
+        "rawPath": "/health",
+        "requestContext": {"http": {"method": "GET"}},
     }
-    table.put_item(Item=item)
-    return item
+
+    resp = lambda_handler(event, None)
+    assert resp["statusCode"] == 200
+    body = json.loads(resp["body"])
+    assert body["status"] == "ok"
 
 
-def list_items() -> list[dict]:
-    resp = table.scan()
-    return resp.get("Items", [])
+def test_create_item_and_list():
+    reset_items()
 
-def reset_items() -> None:
-    """
-    Helper solo para tests:
-    borra todos los items de la tabla (o del mock de boto3).
-    """
-    try:
-        scan = table.scan()
-        items = scan.get("Items", [])
+    create_event = {
+        "rawPath": "/items",
+        "requestContext": {"http": {"method": "POST"}},
+        "body": json.dumps({"name": "Café", "price": 10.5}),
+    }
 
-        if not items:
-            return
+    resp = lambda_handler(create_event, None)
+    assert resp["statusCode"] == 201
+    created = json.loads(resp["body"])
+    assert created["name"] == "Café"
+    assert created["price"] == 10.5
+    assert "id" in created
 
-        with table.batch_writer() as batch:
-            for item in items:
-                # Ajusta la clave primaria según tu modelo
-                batch.delete_item(Key={"id": item["id"]})
-    except Exception:
-        # En los tests con boto3 mockeado, esto no va a hacer nada real,
-        # y cualquier error lo ignoramos porque solo es un helper.
-        pass
+    list_event = {
+        "rawPath": "/items",
+        "requestContext": {"http": {"method": "GET"}},
+    }
+
+    resp_list = lambda_handler(list_event, None)
+    assert resp_list["statusCode"] == 200
+    items_body = json.loads(resp_list["body"])
+    assert len(items_body["items"]) == 1

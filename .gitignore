@@ -1,0 +1,25 @@
+# ---- Python ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache/
+.pytest_cache/
+.venv/
+venv/
+
+# ---- Build de Lambda ----
+build/
+*.zip
+
+# ---- Terraform ----
+# Nunca subas el state local si lo tienes por alguna razón
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# ---- AWS CLI ----
+*.pem

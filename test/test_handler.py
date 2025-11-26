@@ -3,31 +3,16 @@ import os
 import json
 from unittest.mock import MagicMock
 
-# ============================================================
-# MOCK DE BOTO3 PARA EVITAR REGION Y CONEXIONES REALES
-# ============================================================
 sys.modules["boto3"] = MagicMock()
 
-# ============================================================
-# AGREGAR RUTA PARA QUE PYTHON ENCUENTRE `domain.py`
-# ============================================================
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT_DIR)
 
-# ============================================================
-# VARIABLE DE ENTORNO FICTICIA PARA DOMAIN.PY
-# ============================================================
 os.environ.setdefault("TABLE_NAME", "dummy-table")
 
-# ============================================================
-# IMPORTAMOS EL CÓDIGO REAL
-# ============================================================
 from app import handler
 
 
-# ============================================================
-# BASE DE DATOS FICTICIA EN MEMORIA PARA LOS TESTS
-# ============================================================
 _FAKE_DB = []
 
 
@@ -56,16 +41,10 @@ def fake_reset_items():
     _FAKE_DB.clear()
 
 
-# ============================================================
-# SOBREESCRIBIR LAS FUNCIONES IMPORTADAS EN EL HANDLER
-# ============================================================
 handler.create_item = fake_create_item
 handler.list_items = fake_list_items
 
 
-# ============================================================
-# TESTS
-# ============================================================
 def test_health_ok():
     event = {
         "rawPath": "/dev/health",

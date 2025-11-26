@@ -1,5 +1,10 @@
+import sys
 import json
+from unittest.mock import MagicMock
 
+sys.modules["boto3"] = MagicMock()
+
+# Ahora sí podemos importar tu código sin que boto3 falle
 from app.domain import reset_items
 from app.handler import lambda_handler
 
@@ -12,11 +17,13 @@ def test_health_ok():
 
     resp = lambda_handler(event, None)
     assert resp["statusCode"] == 200
+
     body = json.loads(resp["body"])
     assert body["status"] == "ok"
 
 
 def test_create_item_and_list():
+    # Limpia los items iniciales (en memoria)
     reset_items()
 
     create_event = {
@@ -27,6 +34,7 @@ def test_create_item_and_list():
 
     resp = lambda_handler(create_event, None)
     assert resp["statusCode"] == 201
+
     created = json.loads(resp["body"])
     assert created["name"] == "Café"
     assert created["price"] == 10.5
@@ -39,5 +47,6 @@ def test_create_item_and_list():
 
     resp_list = lambda_handler(list_event, None)
     assert resp_list["statusCode"] == 200
+
     items_body = json.loads(resp_list["body"])
     assert len(items_body["items"]) == 1

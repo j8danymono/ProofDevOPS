@@ -2,16 +2,10 @@ import sys
 import os
 import json
 from unittest.mock import MagicMock
-
+from app import handler
 sys.modules["boto3"] = MagicMock()
 
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, ROOT_DIR)
-
 os.environ.setdefault("TABLE_NAME", "dummy-table")
-
-from app import handler
-
 
 _FAKE_DB = []
 

@@ -7,6 +7,7 @@ except ImportError:
     # ejecución dentro del paquete app/ (como en pytest)
     from app.domain import create_item, list_items
 
+
 def _response(status_code: int, body: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "statusCode": status_code,
@@ -21,7 +22,7 @@ def _response(status_code: int, body: Dict[str, Any]) -> Dict[str, Any]:
 
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method = event["requestContext"]["http"]["method"]
-    path   = event["requestContext"]["http"]["path"]
+    path = event["requestContext"]["http"]["path"]
 
     # Opcional si no usas CORS de API Gateway
     if method == "OPTIONS":
@@ -42,8 +43,8 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             body = json.loads(event.get("body") or "{}")
             item = create_item(body["name"], body["price"])
             return _response(201, {
-                "id": item.id, 
-                "name": item.name, 
+                "id": item.id,
+                "name": item.name,
                 "price": item.price
             })
         except Exception as exc:

@@ -2,7 +2,10 @@ import sys
 import os
 import json
 from unittest.mock import MagicMock
-from app import handler
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, ROOT_DIR)
+from app import handler  # noqa: E402
 sys.modules["boto3"] = MagicMock()
 
 os.environ.setdefault("TABLE_NAME", "dummy-table")

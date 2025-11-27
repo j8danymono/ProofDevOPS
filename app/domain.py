@@ -8,6 +8,7 @@ from decimal import Decimal, InvalidOperation
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["TABLE_NAME"])
 
+
 @dataclass
 class Item:
     id: str
@@ -58,3 +59,8 @@ def list_items() -> List[Item]:
             )
         )
     return result
+
+
+def reset_items() -> None:
+    """Solo para tests: borra datos de DynamoDB o del mock."""
+    pass

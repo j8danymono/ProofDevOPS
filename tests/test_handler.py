@@ -47,9 +47,9 @@ handler.list_items = fake_list_items
 
 def test_health_ok():
     event = {
-        "rawPath": "/dev/health",
+        "rawPath": "/health",
         "requestContext": {
-            "http": {"method": "GET", "path": "/dev/health"}
+            "http": {"method": "GET", "path": "/health"}
         },
     }
     resp = handler.lambda_handler(event, None)
@@ -62,8 +62,8 @@ def test_create_item_and_list():
     fake_reset_items()
 
     create_event = {
-        "rawPath": "/dev/items",
-        "requestContext": {"http": {"method": "POST", "path": "/dev/items"}},
+        "rawPath": "/items",
+        "requestContext": {"http": {"method": "POST", "path": "/items"}},
         "body": json.dumps({"name": "Café", "price": 10.5}),
     }
 
@@ -75,8 +75,8 @@ def test_create_item_and_list():
     assert "id" in created
 
     list_event = {
-        "rawPath": "/dev/items",
-        "requestContext": {"http": {"method": "GET", "path": "/dev/items"}},
+        "rawPath": "/items",
+        "requestContext": {"http": {"method": "GET", "path": "/items"}},
     }
 
     resp_list = handler.lambda_handler(list_event, None)

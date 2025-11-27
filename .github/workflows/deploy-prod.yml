@@ -1,12 +1,12 @@
-name: Deploy to Dev
+name: Deploy to Prod
 
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
-  deploy-dev:
+  deploy-prod:
     runs-on: ubuntu-latest
 
     permissions:
@@ -35,17 +35,17 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_DEV }}
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_PROD }}
           aws-region: us-east-1
 
-      - name: Terraform init (DEV)
-        working-directory: infra/environments/dev
+      - name: Terraform init (PROD)
+        working-directory: infra/environments/prod
         run: terraform init -input=false
 
-      - name: Terraform apply (DEV)
-        working-directory: infra/environments/dev
+      - name: Terraform apply (PROD)
+        working-directory: infra/environments/prod
         run: terraform apply -auto-approve -input=false
 
-      - name: Upload frontend to S3 (DEV)
+      - name: Upload frontend to S3 (PROD)
         run: |
-          aws s3 sync frontend/ s3://${{ secrets.S3_FRONTEND_BUCKET_DEV }} --delete
+          aws s3 sync frontend/ s3://${{ secrets.S3_FRONTEND_BUCKET_PROD }} --delete

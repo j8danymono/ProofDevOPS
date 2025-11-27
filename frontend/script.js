@@ -1,5 +1,15 @@
-// 👉 Cambia esta URL por la salida de Terraform (API Gateway endpoint)
-const API_BASE = "https://0jdcbjbem9.execute-api.us-east-1.amazonaws.com/dev";
+let API_BASE = "";
+
+async function loadConfig() {
+    const res = await fetch("/config.json");
+    const config = await res.json();
+    API_BASE = config.API_BASE;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadConfig();
+    loadItems();
+});
 
 document.getElementById("checkHealth").addEventListener("click", async () => {
     const el = document.getElementById("healthStatus");
@@ -13,7 +23,6 @@ document.getElementById("checkHealth").addEventListener("click", async () => {
         el.innerText = "Error consultando el backend";
     }
 });
-
 
 async function loadItems() {
     const list = document.getElementById("itemList");
@@ -53,13 +62,10 @@ document.getElementById("itemForm").addEventListener("submit", async (e) => {
             body: JSON.stringify({ name, price })
         });
 
-        loadItems(); // refrescar lista
+        loadItems();
         e.target.reset();
 
     } catch (e) {
         alert("Error creando item");
     }
 });
-
-// Cargar lista inicial
-loadItems();

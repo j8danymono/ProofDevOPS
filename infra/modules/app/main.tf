@@ -57,15 +57,16 @@ resource "aws_lambda_function" "api" {
   }
 }
 
+# API Gateway
 resource "aws_apigatewayv2_api" "http_api" {
   name          = "${var.project_name}-${var.environment}-http-api"
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_headers     = ["*"]
-    allow_methods     = ["GET", "POST", "OPTIONS"]
-    allow_origins     = ["*"]
-    max_age           = 300
+    allow_headers = ["*"]
+    allow_methods = ["GET", "POST", "OPTIONS"]
+    allow_origins = ["*"]
+    max_age       = 300
   }
 }
 
@@ -110,4 +111,15 @@ resource "aws_lambda_permission" "allow_apigw" {
 
 output "api_endpoint" {
   value = "${aws_apigatewayv2_api.http_api.api_endpoint}/${var.environment}"
+}
+
+resource "aws_s3_bucket_object" "frontend_config" {
+  bucket = var.s3_bucket
+  key    = "config.json"
+
+  content = jsonencode({
+    API_BASE = "${aws_apigatewayv2_api.http_api.api_endpoint}/${var.environment}"
+  })
+
+  content_type = "application/json"
 }

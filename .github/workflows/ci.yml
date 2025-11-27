@@ -45,21 +45,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Infracost
-        uses: infracost/actions/setup@v3
-        with:
-          api-key: ${{ secrets.INFRACOST_API_KEY }}
-
       - name: Terraform init (no backend)
         run: terraform -chdir=infra/app init -backend=false
 
-      - name: Infracost breakdown
-        run: |
-          infracost breakdown --path=infra/app \
-            --format=json --out-file=/tmp/infracost.json
-
-      - name: Infracost comment
-        uses: infracost/actions/comment@v5
+      - name: Run Infracost
+        uses: infracost/infracost-gh-action@v1
         with:
-          path: /tmp/infracost.json
-          behavior: update
+          path: infra/app
+          terraform_working_directory: infra/app
+          post_condition: always

@@ -50,13 +50,16 @@ jobs:
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
+      - name: Terraform init (no backend)
+        run: terraform -chdir=infra/app init -backend=false
+
       - name: Infracost breakdown
         run: |
           infracost breakdown --path=infra/app \
             --format=json --out-file=/tmp/infracost.json
 
       - name: Infracost comment
-        uses: infracost/actions/comment@v3
+        uses: infracost/actions/comment@v5
         with:
           path: /tmp/infracost.json
           behavior: update

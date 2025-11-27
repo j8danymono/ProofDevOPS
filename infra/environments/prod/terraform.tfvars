@@ -1,3 +1,4 @@
 project_name = "devops-123"
-environment  = "prod"
-region       = "us-east-1"
+environment = "prod"
+region = "us-east-1"
+s3_bucket = "devops-123-prod-frontend"

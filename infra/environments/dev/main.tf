@@ -9,9 +9,10 @@ terraform {
 
 module "app" {
   source       = "../../modules/app"
-  project_name = "devops-123"
-  environment  = "dev"
-  region       = "us-east-1"
+  project_name = var.project_name
+  environment  = var.environment
+  region       = var.region
+  s3_bucket    = var.s3_bucket
 }
 
 output "api_endpoint" {

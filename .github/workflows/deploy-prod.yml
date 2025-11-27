@@ -48,4 +48,4 @@ jobs:
 
       - name: Upload frontend to S3 (PROD)
         run: |
-          aws s3 sync frontend/ s3://${{ secrets.S3_FRONTEND_BUCKET_PROD }} --delete
+          aws s3 sync frontend/ s3://${{ secrets.S3_FRONTEND_BUCKET_PROD }} --delete --exclude "config.json"

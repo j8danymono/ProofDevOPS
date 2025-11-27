@@ -1,7 +1,10 @@
 let API_BASE = "";
 
 async function loadConfig() {
-    const res = await fetch("/config.json");
+    const url = window.location.hostname === "localhost"
+    ? "/config.local.json"
+    : "/config.json";
+    const res = await fetch(url);
     const config = await res.json();
     API_BASE = config.API_BASE;
 }
